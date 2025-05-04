@@ -1,0 +1,16 @@
+{
+  "name": "ecommerce-migrations",
+  "version": "1.0.0",
+  "description": "Database migrations for ShopNest e-commerce application",
+  "main": "init-db.js",
+  "scripts": {
+    "migrate": "node init-db.js"
+  },
+  "dependencies": {
+    "mongodb": "^5.9.2",
+    "mongoose": "^7.0.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,4 @@
+/* Custom CSS for header if needed beyond Tailwind classes */
+.transition {
+  transition: all 0.2s ease-in-out;
+} 

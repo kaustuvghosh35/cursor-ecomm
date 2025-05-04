@@ -1,0 +1,12 @@
+/* Custom CSS for home page if needed beyond Tailwind classes */
+.w-fit {
+  width: fit-content;
+}
+
+.transition {
+  transition: all 0.2s ease-in-out;
+}
+
+.capitalize {
+  text-transform: capitalize;
+} 
