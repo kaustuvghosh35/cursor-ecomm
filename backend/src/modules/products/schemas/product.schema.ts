@@ -46,6 +46,18 @@ export class Product {
 
   @Prop({ type: [ReviewSchema], default: [] })
   reviews: Review[];
+  
+  @Prop({ default: false })
+  featured: boolean;
+  
+  @Prop({ default: false })
+  isNew: boolean;
+  
+  @Prop({ default: false })
+  onSale: boolean;
+  
+  @Prop({ type: Number, required: false })
+  discount: number;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product); 

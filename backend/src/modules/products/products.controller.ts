@@ -25,12 +25,22 @@ export class ProductsController {
     @Query('minPrice') minPriceStr?: string,
     @Query('maxPrice') maxPriceStr?: string,
     @Query('sort') sort?: string,
+    @Query('featured') featuredStr?: string,
+    @Query('onSale') onSaleStr?: string,
+    @Query('isNew') isNewStr?: string,
+    @Query('minRating') minRatingStr?: string,
   ) {
     // Parse numeric parameters safely
     const page = pageStr ? parseInt(pageStr, 10) : undefined;
     const limit = limitStr ? parseInt(limitStr, 10) : undefined;
     const minPrice = minPriceStr ? parseFloat(minPriceStr) : undefined;
     const maxPrice = maxPriceStr ? parseFloat(maxPriceStr) : undefined;
+    const minRating = minRatingStr ? parseFloat(minRatingStr) : undefined;
+    
+    // Parse boolean parameters
+    const featured = featuredStr ? featuredStr === 'true' : undefined;
+    const onSale = onSaleStr ? onSaleStr === 'true' : undefined;
+    const isNew = isNewStr ? isNewStr === 'true' : undefined;
     
     return this.productsService.findAll(
       isNaN(page) ? 1 : page, 
@@ -38,7 +48,11 @@ export class ProductsController {
       category, 
       isNaN(minPrice) ? undefined : minPrice, 
       isNaN(maxPrice) ? undefined : maxPrice, 
-      sort
+      sort,
+      featured,
+      onSale,
+      isNew,
+      isNaN(minRating) ? undefined : minRating
     );
   }
 

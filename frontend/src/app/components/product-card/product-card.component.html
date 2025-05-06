@@ -1,11 +1,33 @@
-<div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full flex flex-col">
+<div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full flex flex-col relative group">
+  <!-- Product Badges -->
+  <div class="absolute top-2 left-2 z-10 flex flex-col gap-2">
+    <span *ngIf="product?.onSale" class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+      SALE
+    </span>
+    <span *ngIf="product?.isNew" class="bg-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+      NEW
+    </span>
+    <span *ngIf="product?.featured" class="bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+      FEATURED
+    </span>
+  </div>
+  
+  <!-- Wishlist Button -->
+  <button 
+    class="absolute top-2 right-2 z-10 p-1.5 bg-white/80 backdrop-blur-sm rounded-full text-gray-400 hover:text-red-500 hover:bg-white focus:outline-none focus:ring-2 focus:ring-red-500 transition-all duration-300 transform opacity-0 group-hover:opacity-100"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+    </svg>
+  </button>
+
   <!-- Product Image -->
-  <a [routerLink]="['/products', product?._id]" class="block relative overflow-hidden h-48">
+  <a [routerLink]="['/products', product?._id]" class="block relative overflow-hidden h-48 bg-gray-50">
     <img 
       [src]="product?.image" 
       [alt]="product?.title || 'Product image'" 
-      class="w-full h-full object-contain transform hover:scale-105 transition-transform duration-300"
-      onerror="this.onerror=null; this.src='assets/google-logo.png';"
+      class="w-full h-full object-contain transform group-hover:scale-105 transition-transform duration-300"
+      onerror="this.onerror=null; this.src='https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg';"
     >
   </a>
 
@@ -13,16 +35,23 @@
   <div class="p-4 flex-grow flex flex-col">
     <div class="flex-grow">
       <!-- Category -->
-      <div class="text-xs text-indigo-500 uppercase font-semibold mb-1">{{ product?.category }}</div>
+      <div class="text-xs text-emerald-600 uppercase font-semibold mb-1">{{ product?.category }}</div>
       
       <!-- Title -->
       <a [routerLink]="['/products', product?._id]" class="block">
-        <h2 class="text-lg font-medium text-gray-900 mb-2 hover:text-indigo-600 transition line-clamp-2">{{ product?.title }}</h2>
+        <h2 class="text-lg font-medium text-gray-900 mb-2 hover:text-emerald-600 transition line-clamp-2">{{ product?.title }}</h2>
       </a>
       
       <!-- Price & Rating -->
       <div class="flex justify-between items-center mb-2">
-        <span class="text-xl font-bold text-gray-900">${{ product?.price }}</span>
+        <div>
+          <ng-container *ngIf="product?.onSale && product?.discount">
+            <span class="text-sm text-gray-500 line-through mr-2">
+              ${{ getOriginalPrice() }}
+            </span>
+          </ng-container>
+          <span class="text-xl font-bold text-gray-900">${{ product?.price }}</span>
+        </div>
         
         <div class="flex items-center">
           <svg class="w-4 h-4 text-yellow-400 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -34,12 +63,12 @@
     </div>
     
     <!-- Stock Status -->
-    <div class="text-sm text-gray-500 mb-3" *ngIf="product && product.stock !== undefined">
+    <div class="text-sm mb-3" *ngIf="product && product.stock !== undefined">
       <ng-container *ngIf="product.stock > 10">
-        <span>In Stock</span>
+        <span class="text-emerald-600">In Stock</span>
       </ng-container>
       <ng-container *ngIf="product.stock <= 10 && product.stock > 0">
-        <span class="text-orange-500">Only {{ product.stock }} left</span>
+        <span class="text-amber-500">Only {{ product.stock }} left</span>
       </ng-container>
       <ng-container *ngIf="product.stock <= 0">
         <span class="text-red-500">Out of Stock</span>
@@ -49,15 +78,21 @@
     <!-- Action Buttons -->
     <div class="flex space-x-2">
       <button 
-        class="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 transition"
+        [disabled]="product?.stock === 0"
+        [ngClass]="product?.stock === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700'"
+        class="flex-1 text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition"
+        (click)="addToCart($event)"
       >
-        Add to Cart
+        {{ product?.stock === 0 ? 'Out of Stock' : 'Add to Cart' }}
       </button>
       <button 
-        class="p-2 text-gray-400 hover:text-red-500 border border-gray-300 rounded-md hover:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition"
+        class="p-2 text-gray-400 hover:text-emerald-600 border border-gray-300 rounded-lg hover:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition"
+        (click)="onQuickView($event)"
+        aria-label="View product details"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
         </svg>
       </button>
     </div>

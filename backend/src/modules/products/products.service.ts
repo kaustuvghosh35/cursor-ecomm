@@ -23,6 +23,10 @@ export class ProductsService {
     minPrice?: number,
     maxPrice?: number,
     sort?: string,
+    featured?: boolean,
+    onSale?: boolean,
+    isNew?: boolean,
+    minRating?: number,
   ): Promise<{ products: Product[]; total: number; page: number; limit: number }> {
     const query: any = {};
 
@@ -51,6 +55,23 @@ export class ProductsService {
       if (Object.keys(query.price).length === 0) {
         delete query.price;
       }
+    }
+    
+    // Apply filtering for new product properties
+    if (featured !== undefined) {
+      query.featured = featured;
+    }
+    
+    if (onSale !== undefined) {
+      query.onSale = onSale;
+    }
+    
+    if (isNew !== undefined) {
+      query.isNew = isNew;
+    }
+    
+    if (minRating !== undefined && !isNaN(minRating)) {
+      query.ratings = { $gte: minRating };
     }
 
     // Calculate pagination
